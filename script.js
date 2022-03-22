@@ -1,4 +1,4 @@
-// JavaScript source code
+п»ї// JavaScript source code
 window.onload = function () {
     document.querySelector("#createTable").onclick = () => {
         let size = Number(document.querySelector("#size").value);
@@ -15,8 +15,8 @@ window.onload = function () {
         document.querySelector("#table").appendChild(table);
 
         let div = document.querySelector("#table");
-        div.innerHTML += "Нажмите на ячейку чтобы изменить её<br>";
-        div.innerHTML += "X - непроходимые клетки<br>B - начало<br>E - конец<br>";
+        div.innerHTML += "РќР°Р¶РјРёС‚Рµ РЅР° СЏС‡РµР№РєСѓ С‡С‚РѕР±С‹ РёР·РјРµРЅРёС‚СЊ РµС‘<br>";
+        div.innerHTML += "X - РЅРµРїСЂРѕС…РѕРґРёРјС‹Рµ РєР»РµС‚РєРё<br>B - РЅР°С‡Р°Р»Рѕ<br>E - РєРѕРЅРµС†<br>";
 
         let tds = document.querySelectorAll("td");
         for (i = 0; i < tds.length; ++i) {
@@ -39,8 +39,12 @@ window.onload = function () {
         }
 
         let b = document.createElement("button");
-        b.textContent = "Выполнить поиск пути";
+        b.textContent = "Р’С‹РїРѕР»РЅРёС‚СЊ РїРѕРёСЃРє РїСѓС‚Рё";
         div.appendChild(b);
+
+        function getDist(cur, end) {
+            return Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size));
+        }
 
         b.onclick = function () {
             let begin = -1;
@@ -58,17 +62,22 @@ window.onload = function () {
             }
 
             let path = new Array(size * size);
+            let dist = new Array(size * size);
 
             if (begin === -1 || end === -1)
-                alert("Не задана начальная или конечная позиция");
+                alert("РќРµ Р·Р°РґР°РЅР° РЅР°С‡Р°Р»СЊРЅР°СЏ РёР»Рё РєРѕРЅРµС‡РЅР°СЏ РїРѕР·РёС†РёСЏ");
             else {
                 let q = [];
                 let cur;
+                let len;
                 visit[begin] = 1;
+                dist[begin] = 0;
                 q.push(begin);
+                
                 while (q.length != 0) {
                     cur = q[q.length - 1];
                     q.pop();
+                    if (cur === end) break;
                     if (cur - size >= 0 && visit[cur - size] === 0 && tds[cur - size].innerHTML != "X" ) {
                         visit[cur - size] = visit[cur] + 1;
                         path[cur - size] = cur;
@@ -92,7 +101,7 @@ window.onload = function () {
                 }
             }
             if (visit[end] === 0)
-                alert("Пути нет");
+                alert("РџСѓС‚Рё РЅРµС‚");
             else {
                 for (inpath = end; inpath != begin; ++i)
                 {
