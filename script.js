@@ -45,6 +45,37 @@ window.onload = function () {
         function getDist(cur, end) {
             return Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size));
         }
+        function pushPriority(queue, ver, val) {
+            if (queue.length === 0)
+                queue.push(ver);
+            else {
+                let add = false;
+                for (let i = queue.length - 1; i >= 0; --i) {
+                    if (heuristic[queue[i]] > val) {
+                        collection.splice(i, 0, ver)
+                        added = true
+                        break;
+                    }
+                }
+                if (!add) {
+                    queue.push(ver)
+                }
+            }
+        }
+
+        let N = size * size;
+
+        let visit = new Array(N);
+        for (i = 0; i < N; ++i) {
+            visit[i] = 0;
+        }
+
+        let path = new Array(N);
+        let heuristic = new Array(N);
+        let dist = new Array(N);
+        for (i = 0; i < N; ++i) {
+            dist[i] = 99999999;
+        }
 
         b.onclick = function () {
             let begin = -1;
@@ -56,47 +87,59 @@ window.onload = function () {
                     end = i;
             }
 
-            let visit = new Array(size*size);
-            for (i = 0; i < size * size; ++i) {
-                visit[i] = 0;
-            }
-
-            let path = new Array(size * size);
-            let dist = new Array(size * size);
-
             if (begin === -1 || end === -1)
                 alert("Не задана начальная или конечная позиция");
             else {
                 let q = [];
                 let cur;
-                let len;
-                visit[begin] = 1;
+                let score;
                 dist[begin] = 0;
+                heuristic[begin] = dist[begin] + getDist(begin, end);
                 q.push(begin);
                 
                 while (q.length != 0) {
                     cur = q[q.length - 1];
                     q.pop();
-                    if (cur === end) break;
-                    if (cur - size >= 0 && visit[cur - size] === 0 && tds[cur - size].innerHTML != "X" ) {
-                        visit[cur - size] = visit[cur] + 1;
-                        path[cur - size] = cur;
-                        if (cur - size === end) break; else q.push(cur - size);
+                    visit[cur] = 1;
+                    if (cur === end) {
+                        visit[end] = 1;
+                        break;
                     }
-                    if (cur % size != size - 1 && cur + 1 < size * size && visit[cur + 1] === 0 && tds[cur + 1].innerHTML != "X") {
-                        visit[cur + 1] = visit[cur] + 1;
-                        path[cur + 1] = cur;
-                        if (cur + 1 === end) break; else q.push(cur + 1);
+                    if (cur - size >= 0 && tds[cur - size].innerHTML != "X" ) {
+                        score = dist[cur] + 1;
+                        if (score < dist[cur - size]) {
+                            path[cur - size] = cur;
+                            dist[cur - size] = score;
+                            heuristic[cur - size] = dist[cur - size] + getDist(cur - size, end);
+                        }
+                        if (visit[cur - size] === 0) pushPriority(q, cur - size, heuristic[cur - size]);
                     }
-                    if (cur + size < size * size && visit[cur + size] === 0 && tds[cur + size].innerHTML != "X") {
-                        visit[cur + size] = visit[cur] + 1;
-                        path[cur + size] = cur;
-                        if (cur + size === end) break; else q.push(cur + size);
+                    if (cur % size != size - 1 && cur + 1 < N && tds[cur + 1].innerHTML != "X") {
+                        score = dist[cur] + 1;
+                        if (score < dist[cur + 1]) {
+                            path[cur + 1] = cur;
+                            dist[cur + 1] = score;
+                            heuristic[cur + 1] = dist[cur + 1] + getDist(cur + 1, end);
+                        }
+                        if (visit[cur + 1] === 0) pushPriority(q, cur + 1, heuristic[cur + 1]);
                     }
-                    if (cur % size != 0 && cur - 1 >= 0 && visit[cur - 1] === 0 && tds[cur - 1].innerHTML != "X") {
-                        visit[cur - 1] = visit[cur] + 1;
-                        path[cur - 1] = cur;
-                        if (cur - 1 === end) break; else q.push(cur - 1);
+                    if (cur + size < N && tds[cur + size].innerHTML != "X") {
+                        score = dist[cur] + 1;
+                        if (score < dist[cur + size]) {
+                            path[cur + size] = cur;
+                            dist[cur + size] = score;
+                            heuristic[cur + size] = dist[cur + size] + getDist(cur + size, end);
+                        }
+                        if (visit[cur + size] === 0) pushPriority(q, cur + size, heuristic[cur + size]);
+                    }
+                    if (cur % size != 0 && cur - 1 >= 0 && tds[cur - 1].innerHTML != "X") {
+                        score = dist[cur] + 1;
+                        if (score < dist[cur - 1]) {
+                            path[cur - 1] = cur;
+                            dist[cur - 1] = score;
+                            heuristic[cur - 1] = dist[cur - 1] + getDist(cur - 1, end);
+                        }
+                        if (visit[cur - 1] === 0) pushPriority(q, cur - 1, heuristic[cur - 1]);
                     }
                 }
             }
