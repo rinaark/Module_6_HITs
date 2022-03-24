@@ -43,7 +43,7 @@ window.onload = function () {
         div.appendChild(b);
 
         function getDist(cur, end) {
-            return Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size));
+            return (Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size)))*10;
         }
         function pushPriority(queue, ver, val) {
             if (queue.length === 0)
@@ -52,8 +52,8 @@ window.onload = function () {
                 let add = false;
                 for (let i = queue.length - 1; i >= 0; --i) {
                     if (heuristic[queue[i]] > val) {
-                        collection.splice(i, 0, ver)
-                        added = true
+                        queue.splice(i+1, 0, ver)
+                        add = true
                         break;
                     }
                 }
@@ -64,30 +64,43 @@ window.onload = function () {
         }
 
         let N = size * size;
-
-        let visit = new Array(N);
-        for (i = 0; i < N; ++i) {
-            visit[i] = 0;
-        }
-
-        let path = new Array(N);
         let heuristic = new Array(N);
-        let dist = new Array(N);
-        for (i = 0; i < N; ++i) {
-            dist[i] = 99999999;
-        }
-
+        
         b.onclick = function () {
+            heuristic = new Array(N);
+            let path = new Array(N);
+            let visit = new Array(N);
+            for (i = 0; i < N; ++i) {
+                visit[i] = 0;
+            }
+            let dist = new Array(N);
+            for (i = 0; i < N; ++i) {
+                dist[i] = 99999999;
+            }
             let begin = -1;
             let end = -1;
+            let problem = [ false, false];
             for (i = 0; i < tds.length; ++i) {
+                tds[i].style.backgroundColor = "#FFFFFF";
                 if (tds[i].innerHTML === "B")
-                    begin = i;
+                    if (begin === -1)
+                        begin = i;
+                    else {
+                        problem[0] = true; break;
+                    }
                 else if (tds[i].innerHTML === "E")
-                    end = i;
+                    if (end === -1)
+                        end = i;
+                    else {
+                        problem[1] = true; break;
+                    }
             }
 
-            if (begin === -1 || end === -1)
+            if (problem[0])
+                alert("Несколько начальных позиций!");
+            else if (problem[1])
+                alert("Несколько конечных позиций!");
+            else if (begin === -1 || end === -1)
                 alert("Не задана начальная или конечная позиция");
             else {
                 let q = [];
@@ -96,7 +109,7 @@ window.onload = function () {
                 dist[begin] = 0;
                 heuristic[begin] = dist[begin] + getDist(begin, end);
                 q.push(begin);
-                
+
                 while (q.length != 0) {
                     cur = q[q.length - 1];
                     q.pop();
@@ -105,7 +118,7 @@ window.onload = function () {
                         visit[end] = 1;
                         break;
                     }
-                    if (cur - size >= 0 && tds[cur - size].innerHTML != "X" ) {
+                    if (cur - size >= 0 && tds[cur - size].innerHTML != "X") {
                         score = dist[cur] + 1;
                         if (score < dist[cur - size]) {
                             path[cur - size] = cur;
@@ -116,7 +129,7 @@ window.onload = function () {
                     }
                     if (cur % size != size - 1 && cur + 1 < N && tds[cur + 1].innerHTML != "X") {
                         score = dist[cur] + 1;
-                        if (score < dist[cur + 1]) {
+                        if (score < dist[cur + 1] ) {
                             path[cur + 1] = cur;
                             dist[cur + 1] = score;
                             heuristic[cur + 1] = dist[cur + 1] + getDist(cur + 1, end);
@@ -142,17 +155,17 @@ window.onload = function () {
                         if (visit[cur - 1] === 0) pushPriority(q, cur - 1, heuristic[cur - 1]);
                     }
                 }
-            }
-            if (visit[end] === 0)
-                alert("Пути нет");
-            else {
-                for (inpath = end; inpath != begin; ++i)
-                {
-                    tds[inpath].style.backgroundColor = "#FFFF00";
-                    inpath = path[inpath];
+                if (visit[end] === 0)
+                    alert("Пути нет");
+                else {
+                    for (inpath = end; inpath != begin; ++i) {
+                        tds[inpath].style.backgroundColor = "#FFFF00";
+                        inpath = path[inpath];
+                    }
+                    tds[begin].style.backgroundColor = "#FFFF00";
                 }
-                tds[begin].style.backgroundColor = "#FFFF00";
             }
+            
         }
     };
 }
