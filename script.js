@@ -1,6 +1,7 @@
 ﻿// JavaScript source code
 window.onload = function () {
-    document.querySelector("#createTable").onclick = () => {
+    var creatMapBut = document.querySelector("#createTable");
+    creatMapBut.onclick = function () {
         let size = Number(document.querySelector("#size").value);
         let table = document.createElement("table");
 
@@ -15,26 +16,50 @@ window.onload = function () {
         document.querySelector("#table").appendChild(table);
 
         let div = document.querySelector("#table");
-        div.innerHTML += "Нажмите на ячейку чтобы изменить её<br>";
-        div.innerHTML += "X - непроходимые клетки<br>B - начало<br>E - конец<br>";
 
-        let tds = document.querySelectorAll("td");
+        let radio1 = document.createElement("input");
+        radio1.type = "radio"; radio1.id = "r1"; radio1.name = "chose"; radio1.checked = true;
+        let lab = document.createElement("label");
+        lab.htmlFor = "r1"; lab.innerHTML = "X";
+        div.appendChild(radio1); div.appendChild(lab);
+
+        let radio2 = document.createElement("input");
+        radio2.type = "radio"; radio2.id = "r2"; radio2.name = "chose";
+        lab = document.createElement("label");
+        lab.htmlFor = "r2"; lab.innerHTML = "Begin";
+        div.appendChild(radio2); div.appendChild(lab);
+
+        let radio3 = document.createElement("input");
+        radio3.type = "radio"; radio3.id = "r3"; radio3.name = "chose";
+        lab = document.createElement("label"); 
+        lab.htmlFor = "r3"; lab.innerHTML = "End";
+        div.appendChild(radio3); div.appendChild(lab);
+
+        let p = document.createElement("p");
+        p.innerHTML = "Нажмите на ячейку чтобы изменить её<br>Двойное нажатие очищает ячейку<br>";
+        p.innerHTML +="X - непроходимые клетки<br>B - начало<br>E - конец<br>";
+        div.appendChild(p);
+
+        let begin = -1;
+        let end = -1;
+        let tds = document.querySelectorAll("td");      //Нажатие на ячейку 
         for (i = 0; i < tds.length; ++i) {
             tds[i].onclick = function () {
-                if (this.innerHTML == "")
+                if (radio1.checked)
                     this.innerHTML = "X";
-                else
-                    switch (this.innerHTML) {
-                        case "X":
-                            this.innerHTML = "B";
-                            break;
-                        case "B":
-                            this.innerHTML = "E";
-                            break;
-                        case "E":
-                            this.innerHTML = "";
-                            break;
+                else if (radio2.checked) {
+                    if (begin != -1) tds[begin].innerHTML = "";
+                    this.innerHTML = "B";
+                    begin = this.parentNode.rowIndex * size + this.cellIndex;
                 }
+                else if (radio3.checked) {
+                    if (end != -1) tds[end].innerHTML = "";
+                    this.innerHTML = "E";
+                    end = this.parentNode.rowIndex * size + this.cellIndex;
+                }
+            }
+            tds[i].ondblclick = function () {
+                this.innerHTML = "";
             }
         }
 
@@ -43,7 +68,7 @@ window.onload = function () {
         div.appendChild(b);
 
         function getDist(cur, end) {
-            return (Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size)))*10;
+            return (Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size))) * 10;
         }
         function pushPriority(queue, ver, val) {
             if (queue.length === 0)
@@ -52,7 +77,7 @@ window.onload = function () {
                 let add = false;
                 for (let i = queue.length - 1; i >= 0; --i) {
                     if (heuristic[queue[i]] > val) {
-                        queue.splice(i+1, 0, ver)
+                        queue.splice(i + 1, 0, ver)
                         add = true
                         break;
                     }
@@ -65,8 +90,8 @@ window.onload = function () {
 
         let N = size * size;
         let heuristic = new Array(N);
-        
-        b.onclick = function () {
+
+        b.onclick = function () {               //Алгоритм А*
             heuristic = new Array(N);
             let path = new Array(N);
             let visit = new Array(N);
@@ -77,30 +102,12 @@ window.onload = function () {
             for (i = 0; i < N; ++i) {
                 dist[i] = 99999999;
             }
-            let begin = -1;
-            let end = -1;
-            let problem = [ false, false];
+            
             for (i = 0; i < tds.length; ++i) {
                 tds[i].style.backgroundColor = "#FFFFFF";
-                if (tds[i].innerHTML === "B")
-                    if (begin === -1)
-                        begin = i;
-                    else {
-                        problem[0] = true; break;
-                    }
-                else if (tds[i].innerHTML === "E")
-                    if (end === -1)
-                        end = i;
-                    else {
-                        problem[1] = true; break;
-                    }
             }
 
-            if (problem[0])
-                alert("Несколько начальных позиций!");
-            else if (problem[1])
-                alert("Несколько конечных позиций!");
-            else if (begin === -1 || end === -1)
+            if (begin === -1 || end === -1)
                 alert("Не задана начальная или конечная позиция");
             else {
                 let q = [];
@@ -129,7 +136,7 @@ window.onload = function () {
                     }
                     if (cur % size != size - 1 && cur + 1 < N && tds[cur + 1].innerHTML != "X") {
                         score = dist[cur] + 1;
-                        if (score < dist[cur + 1] ) {
+                        if (score < dist[cur + 1]) {
                             path[cur + 1] = cur;
                             dist[cur + 1] = score;
                             heuristic[cur + 1] = dist[cur + 1] + getDist(cur + 1, end);
@@ -165,7 +172,8 @@ window.onload = function () {
                     tds[begin].style.backgroundColor = "#FFFF00";
                 }
             }
-            
+
         }
-    };
+        this.remove();
+    }
 }
