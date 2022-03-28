@@ -4,6 +4,11 @@
     border: 1px solid black;
     text-align:center;
 }
+canvas {
+    border: 1px solid black;
+    height: 500px;
+    width: 800px;
+}
 .back-button {
     background-color: antiquewhite;
     border: 2px solid black;
