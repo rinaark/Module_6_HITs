@@ -92,13 +92,13 @@ window.onload = function () {
     //
     let button = document.getElementById('startButton');
     button.onclick = function () {
-        let numberOfClusters = document.getElementById('numberOfClusters').value;
+        let numberOfClusters = Number(document.getElementById('numberOfClusters').value);
         let clusters = [];
         for (let i = 0; i < numberOfClusters; i++) {
             let newClusterCenter = [
                 [
-                    [Math.floor(Math.random() * 500)],
-                    [Math.floor(Math.random() * 500)]
+                    Math.floor(Math.random() * 500),
+                    Math.floor(Math.random() * 500)
                 ]
             ];
             clusters.push(newClusterCenter);
