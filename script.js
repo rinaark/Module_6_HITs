@@ -44,9 +44,9 @@ function clustering(clusters, arrayOfPoints) {
     let final = true;
     for (let i = 0; i < clusters.length; i++) {
         newCoords = newCenter(clusters[i]);
-        if (newCoords != clasters[i][0]) {
+        if (newCoords != clusters[i][0]) {
             clusters[i][0][0] = newCoords[0];
-            clusters[i][0][1] = newCords[1];
+            clusters[i][0][1] = newCoords[1];
             final = false;
         }
     }
@@ -66,6 +66,9 @@ function clustering(clusters, arrayOfPoints) {
         }
     }
     else {
+        for (let i = 0; i < clusters.length; i++) {
+            clusters[i].length = 1;
+        }
         clustering(clusters, arrayOfPoints);
     }
 }
