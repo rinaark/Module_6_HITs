@@ -6,8 +6,6 @@
 }
 canvas {
     border: 1px solid black;
-    height: 500px;
-    width: 800px;
 }
 .back-button {
     background-color: antiquewhite;
