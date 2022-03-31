@@ -17,8 +17,14 @@ function newCenter(cluster) {
         newCenterX += cluster[i][0];
         newCenterY += cluster[i][1];
     }
-    newCenterX /= (cluster.length - 1);
-    newCenterY /= (cluster.length - 1);
+    if (cluster.length > 1) {
+        newCenterX /= (cluster.length - 1);
+        newCenterY /= (cluster.length - 1);
+    }
+    else {
+        newCenterX = Math.floor(Math.random() * 500);
+        newCenterY = Math.floor(Math.random() * 500);
+    }
     let newCenterCoords = [];
     newCenterCoords.push(newCenterX);
     newCenterCoords.push(newCenterY);
