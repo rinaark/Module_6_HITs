@@ -52,16 +52,17 @@ function clustering(clusters, arrayOfPoints) {
     }
     if (final) {
         // красим точки
-        for (let i = 0; i < arrayOfPoints.length; i++) {
+        for (let i = 0; i < clusters.length; i++) {
             let canvas = document.getElementById('canvas');
             let ctx = canvas.getContext('2d');
-            let t = canvas.getBoundingClientRect();
-            let x = arrayOfPoints[i][0];
-            let y = arrayOfPoints[i][1];
             ctx.strokeStyle = 'rgb(' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ')';
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2, true);
-            ctx.fill();
+            for (let j = 1; j < clusters[i].length; j++) {
+                let x = clusters[i][j][0];
+                let y = clusters[i][j][1];
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2, true);
+                ctx.fill();
+            }
         }
     }
     else {
