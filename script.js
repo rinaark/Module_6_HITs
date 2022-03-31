@@ -44,7 +44,7 @@ function clustering(clusters, arrayOfPoints) {
     let final = true;
     for (let i = 0; i < clusters.length; i++) {
         newCoords = newCenter(clusters[i]);
-        if (newCoords != clusters[i][0]) {
+        if ((newCoords[0] != clusters[i][0][0]) || (newCoords[1] != clusters[i][0][1])) {
             clusters[i][0][0] = newCoords[0];
             clusters[i][0][1] = newCoords[1];
             final = false;
