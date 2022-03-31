@@ -41,6 +41,7 @@ function clustering(clusters, arrayOfPoints) {
         }
         clusters[indexMin].push(arrayOfPoints[i]);
     }
+
     let final = true;
     for (let i = 0; i < clusters.length; i++) {
         newCoords = newCenter(clusters[i]);
@@ -55,7 +56,7 @@ function clustering(clusters, arrayOfPoints) {
         for (let i = 0; i < clusters.length; i++) {
             let canvas = document.getElementById('canvas');
             let ctx = canvas.getContext('2d');
-            ctx.strokeStyle = 'rgb(' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ')';
+            ctx.fillStyle = 'rgb(' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ')';
             for (let j = 1; j < clusters[i].length; j++) {
                 let x = clusters[i][j][0];
                 let y = clusters[i][j][1];
@@ -94,10 +95,13 @@ window.onload = function () {
         let numberOfClusters = document.getElementById('numberOfClusters').value;
         let clusters = [];
         for (let i = 0; i < numberOfClusters; i++) {
-            let newCluster = [
-                arrayOfPoints[i]
+            let newClusterCenter = [
+                [
+                    [Math.floor(Math.random() * 500)],
+                    [Math.floor(Math.random() * 500)]
+                ]
             ];
-            clusters.push(newCluster);
+            clusters.push(newClusterCenter);
         }
         clustering(clusters, arrayOfPoints);
     }
