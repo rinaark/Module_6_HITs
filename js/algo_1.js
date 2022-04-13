@@ -1,14 +1,73 @@
-﻿// JavaScript source code
+﻿//Функция паузы
+function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+//Алгоритм генерации лабиринта(на основе Прима)
+async function creatLabyrinth(tds, size) {
+    let N = size * size;
+    let begin = Math.floor(Math.random() * (size * size));
+    tds[begin].innerHTML = "";
+
+    let check = [];
+    if (begin - 2 * size >= 0) {
+        check.push(begin - 2 * size);
+    }
+    if (begin % size < size - 2 && begin + 2 < N) {
+        check.push(begin + 2);
+    }
+    if (begin + 2 * size < N) {
+        check.push(begin + 2 * size);
+    }
+    if (begin % size > 1 && begin - 2 >= 0) {
+        check.push(begin - 2);
+    }
+
+    while (check.length > 0) {
+        await sleep(100);
+        let ran = Math.floor(Math.random() * check.length);
+        let ind = check[ran];
+        tds[ind].innerHTML = "";
+        check.splice(ran, 1);
+
+        if (ind - 2 * size >= 0 && tds[ind - 2 * size].innerHTML != "X") {
+            tds[ind - size].innerHTML = "";
+        }
+        else if (ind % size < size - 2 && ind + 2 < N && tds[ind + 2].innerHTML != "X") {
+            tds[ind + 1].innerHTML = "";
+        }
+        else if (ind + 2 * size < N && tds[ind + 2 * size].innerHTML != "X") {
+            tds[ind + size].innerHTML = "";
+        }
+        else if (ind % size > 1 && ind - 2 >= 0 && tds[ind - 2].innerHTML != "X") {
+            tds[ind - 1].innerHTML = "";
+        }
+
+        if (ind - 2 * size >= 0 && tds[ind - 2 * size].innerHTML == "X") {
+            check.push(ind - 2 * size);
+        }
+        if (ind % size < size - 2 && ind + 2 < N && tds[ind + 2].innerHTML == "X") {
+            check.push(ind + 2);
+        }
+        if (ind + 2 * size < N && tds[ind + 2 * size].innerHTML == "X") {
+            check.push(ind + 2 * size);
+        }
+        if (ind % size > 1 && ind - 2 >= 0 && tds[ind - 2].innerHTML == "X") {
+            check.push(ind - 2);
+        }
+    }
+}
+
 window.onload = function () {
     var creatMapBut = document.querySelector("#createTable");
     creatMapBut.onclick = function () {
         let size = Number(document.querySelector("#size").value);
         let table = document.createElement("table");
-
+                                                        //Создание таблицы
         for (i = 0; i < size; ++i) {
             let tr = document.createElement("tr");
             for (j = 0; j < size; ++j) {
                 let td = document.createElement("td");
+                td.innerHTML = "X";
                 tr.appendChild(td);
             }
             table.appendChild(tr)
@@ -40,9 +99,10 @@ window.onload = function () {
         p.innerHTML +="X - непроходимые клетки<br>B - начало<br>E - конец<br>";
         div.appendChild(p);
 
+        //Нажатия на ячейку
         let begin = -1;
         let end = -1;
-        let tds = document.querySelectorAll("td");      //Нажатие на ячейку 
+        let tds = document.querySelectorAll("td");       
         for (i = 0; i < tds.length; ++i) {
             tds[i].onclick = function () {
                 if (radio1.checked)
@@ -67,8 +127,13 @@ window.onload = function () {
         b.textContent = "Выполнить поиск пути";
         div.appendChild(b);
 
+        let N = size * size;
+
+        creatLabyrinth(tds, size);
+
+        //Алгоритм А*
         function getDist(cur, end) {
-            return (Math.abs(cur % size - end % size) + Math.abs(Math.floor(cur / size) - Math.floor(end / size))) * 10;
+            return Math.sqrt(Math.pow(cur % size - end % size,2) + Math.pow((cur / size) - (end / size),2)) * 10;
         }
         function pushPriority(queue, ver, val) {
             if (queue.length === 0)
@@ -77,21 +142,20 @@ window.onload = function () {
                 let add = false;
                 for (let i = queue.length - 1; i >= 0; --i) {
                     if (heuristic[queue[i]] > val) {
-                        queue.splice(i + 1, 0, ver)
-                        add = true
+                        queue.splice(i + 1, 0, ver);
+                        add = true;
                         break;
                     }
                 }
                 if (!add) {
-                    queue.push(ver)
+                    queue.splice(0, 0, ver)
                 }
             }
         }
-
-        let N = size * size;
         let heuristic = new Array(N);
 
-        b.onclick = function () {               //Алгоритм А*
+        //Основная часть алгоритма
+        b.onclick = async function () {
             heuristic = new Array(N);
             let path = new Array(N);
             let visit = new Array(N);
@@ -121,6 +185,10 @@ window.onload = function () {
                     cur = q[q.length - 1];
                     q.pop();
                     visit[cur] = 1;
+
+                    tds[cur].style.backgroundColor = "#F08080";
+                    await sleep(200);
+
                     if (cur === end) {
                         visit[end] = 1;
                         break;
@@ -132,7 +200,10 @@ window.onload = function () {
                             dist[cur - size] = score;
                             heuristic[cur - size] = dist[cur - size] + getDist(cur - size, end);
                         }
-                        if (visit[cur - size] === 0) pushPriority(q, cur - size, heuristic[cur - size]);
+                        if (visit[cur - size] === 0) {
+                            tds[cur - size].style.backgroundColor = "#DCDCDC";
+                            pushPriority(q, cur - size, heuristic[cur - size]);
+                        }
                     }
                     if (cur % size != size - 1 && cur + 1 < N && tds[cur + 1].innerHTML != "X") {
                         score = dist[cur] + 1;
@@ -141,7 +212,10 @@ window.onload = function () {
                             dist[cur + 1] = score;
                             heuristic[cur + 1] = dist[cur + 1] + getDist(cur + 1, end);
                         }
-                        if (visit[cur + 1] === 0) pushPriority(q, cur + 1, heuristic[cur + 1]);
+                        if (visit[cur + 1] === 0) {
+                            tds[cur + 1].style.backgroundColor = "#DCDCDC";
+                            pushPriority(q, cur + 1, heuristic[cur + 1]);
+                        }
                     }
                     if (cur + size < N && tds[cur + size].innerHTML != "X") {
                         score = dist[cur] + 1;
@@ -150,7 +224,10 @@ window.onload = function () {
                             dist[cur + size] = score;
                             heuristic[cur + size] = dist[cur + size] + getDist(cur + size, end);
                         }
-                        if (visit[cur + size] === 0) pushPriority(q, cur + size, heuristic[cur + size]);
+                        if (visit[cur + size] === 0) {
+                            tds[cur + size].style.backgroundColor = "#DCDCDC";
+                            pushPriority(q, cur + size, heuristic[cur + size]);
+                        }
                     }
                     if (cur % size != 0 && cur - 1 >= 0 && tds[cur - 1].innerHTML != "X") {
                         score = dist[cur] + 1;
@@ -159,8 +236,12 @@ window.onload = function () {
                             dist[cur - 1] = score;
                             heuristic[cur - 1] = dist[cur - 1] + getDist(cur - 1, end);
                         }
-                        if (visit[cur - 1] === 0) pushPriority(q, cur - 1, heuristic[cur - 1]);
+                        if (visit[cur - 1] === 0) {
+                            tds[cur - 1].style.backgroundColor = "#DCDCDC";
+                            pushPriority(q, cur - 1, heuristic[cur - 1]);
+                        }
                     }
+                    await sleep(200);
                 }
                 if (visit[end] === 0)
                     alert("Пути нет");
@@ -168,6 +249,7 @@ window.onload = function () {
                     for (inpath = end; inpath != begin; ++i) {
                         tds[inpath].style.backgroundColor = "#FFFF00";
                         inpath = path[inpath];
+                        await sleep(200);
                     }
                     tds[begin].style.backgroundColor = "#FFFF00";
                 }
@@ -177,3 +259,4 @@ window.onload = function () {
         this.remove();
     }
 }
+
