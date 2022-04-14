@@ -150,7 +150,36 @@ function Kruscal(arrayOfPoints) {
 }
 
 function compareClusters(clustersK, clustersG) {
-
+    for (let i = 0; i < clustersG.length; i++) {
+        let compare = false;
+        for (let j = 0; ((j < clustersK.length) && (compare === false)); j++) {
+            let count = 0;
+            for (let k = 0; k < clustersG[i].points.length; k++) {
+                if (contains(clustersK[j].points, clustersG[i].points[k])) {
+                    count += 1;
+                }
+            }
+            if (count > (clustersG[i].points.length / 2)) {
+                clustersG[i].colour = clustersK[j].colour;
+                compare = true;
+            }
+        }
+        if (!compare) {
+            clustersG[i].colour = 'rgb(' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ')';
+        }
+    }
+    for (let i = 0; i < clusters.length; i++) {
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        ctx.fillStyle = clusters[i].colour;
+        for (let j = 0; j < clusters[i].points.length; j++) {
+            let x = clusters[i].points[j].x;
+            let y = clusters[i].points[j].y;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI, true);
+            ctx.fill();
+        }
+    }
 }
 
 //функция кластеризации через удаление н рёбер графа
@@ -163,13 +192,13 @@ function graph(numberOfClusters, arrayOfPoints) {
     for (let i = 0; i < numberOfClusters; i++) {
         let newCluster = new ClusterG();
         newCluster.points.push(arrayOfPoints[0]);
-        arrayOfPoints.slice(0, 1);
+        arrayOfPoints.splice(0, 1);
         let check = true;
         while (check) {
             check = false;
             for (let j = 0; j < MST.length; j++) {
                 if (contains(newCluster.points, MST[j].to)) {
-                    newCluster.push(MST[j].to);
+                    newCluster.points.push(MST[j].to);
                     arrayOfPoints.splice(arrayOfPoints.indexOf(MST[j].to), 1);
                     MST.splice(j, 1);
                     check = true;
@@ -185,19 +214,6 @@ function graph(numberOfClusters, arrayOfPoints) {
             }
         }
         clusters.push(newCluster);
-    }
-    for (let i = 0; i < clusters.length; i++) {
-        let canvas = document.getElementById('canvas');
-        let ctx = canvas.getContext('2d');
-        clusters[i].colour = 'rgb(' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ', ' + Math.round(Math.random() * 255) + ')';
-        ctx.fillStyle = clusters[i].colour;
-        for (let j = 0; j < clusters[i].points.length; j++) {
-            let x = clusters[i].points[j].x;
-            let y = clusters[i].points[j].y;
-            ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2, true);
-            ctx.fill();
-        }
     }
     return clusters;
 }
@@ -230,7 +246,7 @@ window.onload = function () {
                 let newCluster = new ClusterK(new Point(Math.floor(Math.random() * 500), Math.floor(Math.random() * 500)));
                 clusters.push(newCluster);
             }
-            //let clustersK = kmeans(clusters, arrayOfPoints);
+            let clustersK = kmeans(clusters, arrayOfPoints);
             let clustersG = graph(numberOfClusters, arrayOfPoints);
         }
     }
