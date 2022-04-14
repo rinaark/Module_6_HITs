@@ -1,4 +1,7 @@
-﻿class Point {
+﻿function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+}
+class Point {
     x; y;
     constructor(x, y) {
         this.x = x;
@@ -65,11 +68,21 @@ function cross(population, populationSize) {
             child1.push(population[p1][j]);
             child2.push(population[p2][j]);
         }
-        for (let j = 0; j < population[0].length - 1; ++j) {
+        for (let j = breakPoint; j < population[0].length - 1; ++j) {
             if (!check(child1, population[p2][j]))
                 child1.push(population[p2][j]);
             if (!check(child2, population[p1][j]))
                 child2.push(population[p1][j]);
+        }
+        if (child1.length < population[0].length - 1) {
+            for (let j = breakPoint; j < population[0].length - 1; ++j)
+                if (!check(child1, population[p1][j]))
+                    child1.push(population[p1][j]);
+        }
+        if (child2.length < population[0].length - 1) {
+            for (let j = breakPoint; j < population[0].length - 1; ++j)
+                if (!check(child2, population[p2][j]))
+                    child2.push(population[p2][j]);
         }
         child1.push(getScore(child1));
         child2.push(getScore(child2));
@@ -87,9 +100,17 @@ function mutate(population, percent) {
             c2 = Math.floor(Math.random() * (population[i].length - 1));
             while (c1 == c2)
                 c2 = Math.floor(Math.random() * (population[i].length - 1));
-            temp = population[i][c1];
-            population[i][c1] = population[i][c2];
-            population[i][c2] = temp;
+            if (c1 > c2) { temp = c1; c1 = c2; c2 = temp; }
+            let newA = [];
+            let j;
+            for (j = 0; j < c1; ++j) newA.push(population[i][j]);
+            for (j = c2; j >= c1; --j) newA.push(population[i][j]);
+            for (j = c2 + 1; j < population[i].length - 1; ++j) newA.push(population[i][j]);
+            //temp = population[i][c1];
+            //population[i][c1] = population[i][c2];
+            //population[i][c2] = temp;
+            newA.push(getScore(newA));
+            population[i] = newA;
         }
     }
 }
@@ -124,6 +145,7 @@ window.onload = function () {
     let arrayOfPoints = [];
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
+    //Добавление точек
     canvas.onclick = function (event) {
         let t = canvas.getBoundingClientRect();
         let x = (event.clientX - t.left) * canvas.width / canvas.clientWidth;
@@ -135,21 +157,32 @@ window.onload = function () {
         let newPoint = new Point(x, y);
         arrayOfPoints.push(newPoint);
     }
+    //Основная часть алгоритма
     let button = document.getElementById('startButton');
-    button.onclick = function () {
+    button.onclick = async function () {
         if (arrayOfPoints.length < 4) {
-            alert("Мало точек!(Меньше 4-х)");
+            let pop = mix(arrayOfPoints);
+            show(pop);
         }
         else {
             let population = []
             let populationSize = arrayOfPoints.length * 8;
             let elit = Math.floor(populationSize / 4);
+            if (arrayOfPoints.length > 50) {
+                populationSize = arrayOfPoints.length * 6;
+                elit = Math.floor(populationSize / 6);
+            }
             let repeat = 1000;
             let percentMut = 10;
+            let bestScore = 0;
+
             for (let i = 0; i < populationSize; ++i)
                 population[i] = mix(arrayOfPoints);
             for (let i = 0; i < repeat; ++i) {
                 select(population, elit);
+                if (bestScore != population[0][population[0].length - 1]) {
+                    await sleep(15); bestScore = population[0][population[0].length - 1];
+                }
                 cross(population, populationSize);
                 mutate(population, percentMut);
             }

@@ -3,7 +3,7 @@ function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
 //Алгоритм генерации лабиринта(на основе Прима)
-async function creatLabyrinth(tds, size) {
+async function creatLabyrinth(tds, size, waitLab) {
     let N = size * size;
     let begin = Math.floor(Math.random() * (size * size));
     tds[begin].innerHTML = "";
@@ -23,24 +23,42 @@ async function creatLabyrinth(tds, size) {
     }
 
     while (check.length > 0) {
-        await sleep(100);
+        if (waitLab > 0)
+            await sleep(waitLab);
+
         let ran = Math.floor(Math.random() * check.length);
         let ind = check[ran];
         tds[ind].innerHTML = "";
         check.splice(ran, 1);
 
-        if (ind - 2 * size >= 0 && tds[ind - 2 * size].innerHTML != "X") {
-            tds[ind - size].innerHTML = "";
+        let choose = [1, 2, 3, 4];
+        while (choose.length > 0) {
+            let indch = Math.floor(Math.random() * choose.length);
+            switch (choose[indch]) {
+                case 1:
+                    if (ind - 2 * size >= 0 && tds[ind - 2 * size].innerHTML != "X") {
+                        tds[ind - size].innerHTML = ""; choose.length = 0;
+                    }
+                    break;
+                case 2:
+                    if (ind % size < size - 2 && ind + 2 < N && tds[ind + 2].innerHTML != "X") {
+                        tds[ind + 1].innerHTML = ""; choose.length = 0;
+                    }
+                    break;
+                case 3:
+                    if (ind + 2 * size < N && tds[ind + 2 * size].innerHTML != "X") {
+                        tds[ind + size].innerHTML = ""; choose.length = 0;
+                    }
+                    break;
+                case 4:
+                    if (ind % size > 1 && ind - 2 >= 0 && tds[ind - 2].innerHTML != "X") {
+                        tds[ind - 1].innerHTML = ""; choose.length = 0;
+                    }
+                    break;
+            }
+            choose.splice(indch, 1);
         }
-        else if (ind % size < size - 2 && ind + 2 < N && tds[ind + 2].innerHTML != "X") {
-            tds[ind + 1].innerHTML = "";
-        }
-        else if (ind + 2 * size < N && tds[ind + 2 * size].innerHTML != "X") {
-            tds[ind + size].innerHTML = "";
-        }
-        else if (ind % size > 1 && ind - 2 >= 0 && tds[ind - 2].innerHTML != "X") {
-            tds[ind - 1].innerHTML = "";
-        }
+    
 
         if (ind - 2 * size >= 0 && tds[ind - 2 * size].innerHTML == "X") {
             check.push(ind - 2 * size);
@@ -96,7 +114,8 @@ window.onload = function () {
 
         let p = document.createElement("p");
         p.innerHTML = "Нажмите на ячейку чтобы изменить её<br>Двойное нажатие очищает ячейку<br>";
-        p.innerHTML +="X - непроходимые клетки<br>B - начало<br>E - конец<br>";
+        p.innerHTML += "X - непроходимые клетки<br>B - начало<br>E - конец<br>";
+        p.innerHTML += "Результатом успешной работы алгоритма будет путь, выделенный жёлтым цветом";
         div.appendChild(p);
 
         //Нажатия на ячейку
@@ -129,7 +148,11 @@ window.onload = function () {
 
         let N = size * size;
 
-        creatLabyrinth(tds, size);
+        let waitLab = 50, waitAlgo = 150;
+        if (size > 12) { waitLab = 5; waitAlgo = 40; }
+        if (size >= 45) { waitLab = 0; waitAlgo = 20; }
+
+        creatLabyrinth(tds, size, waitLab);     //Генерируем лабиринт
 
         //Алгоритм А*
         function getDist(cur, end) {
@@ -187,7 +210,7 @@ window.onload = function () {
                     visit[cur] = 1;
 
                     tds[cur].style.backgroundColor = "#F08080";
-                    await sleep(200);
+                    await sleep(waitAlgo);
 
                     if (cur === end) {
                         visit[end] = 1;
@@ -241,7 +264,7 @@ window.onload = function () {
                             pushPriority(q, cur - 1, heuristic[cur - 1]);
                         }
                     }
-                    await sleep(200);
+                    await sleep(waitAlgo);
                 }
                 if (visit[end] === 0)
                     alert("Пути нет");
@@ -249,7 +272,7 @@ window.onload = function () {
                     for (inpath = end; inpath != begin; ++i) {
                         tds[inpath].style.backgroundColor = "#FFFF00";
                         inpath = path[inpath];
-                        await sleep(200);
+                        await sleep(waitAlgo);
                     }
                     tds[begin].style.backgroundColor = "#FFFF00";
                 }
