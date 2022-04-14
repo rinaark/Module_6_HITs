@@ -13,13 +13,6 @@ class ClusterK {
     }
 }
 
-class ClusterG {
-    constructor() {
-        this.points = [];
-        this.colour = 'rgb(0, 0, 0)';
-    }
-}
-
 class Rib {
     constructor(from, to, size) {
         this.from = from;
@@ -113,7 +106,6 @@ function kmeans(clusters, arrayOfPoints) {
             ctx.fill();
         }
     }
-    return clusters;
 }
 
 function contains(arr, elem) {
@@ -164,7 +156,6 @@ function graph(numberOfClusters, arrayOfPoints) {
     let MST = Kruscal(arrayOfPoints);
     let k = MST.length;
     MST.length = (k - numberOfClusters + 1);
-    let clusters = [];
 
     let canvas = document.getElementById('canvas');
     let ctx = canvas.getContext('2d');
@@ -175,7 +166,6 @@ function graph(numberOfClusters, arrayOfPoints) {
         ctx.lineTo(MST[i].to.x, MST[i].to.y);
         ctx.stroke();
     }
-    return clusters;
 }
 
 // здесь должны считываться точки и записываться в массив
@@ -206,8 +196,10 @@ window.onload = function () {
                 let newCluster = new ClusterK(new Point(Math.floor(Math.random() * 500), Math.floor(Math.random() * 500)));
                 clusters.push(newCluster);
             }
-            let clustersK = kmeans(clusters, arrayOfPoints);
-            let clustersG = graph(numberOfClusters, arrayOfPoints);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            kmeans(clusters, arrayOfPoints);
+            graph(numberOfClusters, arrayOfPoints);
         }
     }
 }
