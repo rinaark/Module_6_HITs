@@ -8,8 +8,11 @@
 </head>
 <body>
     <canvas id="canvas" width="500" height="500"></canvas>
-    <input id="numberOfClusters" type="number">
-    <button type="submit" id="startButton">Поехали</button>
+    <p>
+        Введите количество кластеров (не более количества точек):
+        <input id="numberOfClusters" type="number" min="2" required>
+        <button type="submit" id="startButton">Поехали!</button>
+    </p>
     <script type="text/javascript" src="script.js"></script>
 </body>
 </html>
