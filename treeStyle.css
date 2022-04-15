@@ -1,0 +1,15 @@
+﻿.node {
+    border: 2px solid black;
+    width: fit-content;
+    position: absolute;
+}
+
+.line {
+    position: absolute;
+}
+
+.passed {
+    border: 2px solid red;
+    width: fit-content;
+    position: absolute;
+}
