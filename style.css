@@ -40,3 +40,9 @@ footer {
 .main {
     text-align: center;
 }
+#cl {
+    width: 400px;
+    height: 400px;
+    margin: 10px;
+    border: 1px solid black;
+}
