@@ -115,7 +115,9 @@ window.onload = function () {
         let p = document.createElement("p");
         p.innerHTML = "Нажмите на ячейку чтобы изменить её<br>Двойное нажатие очищает ячейку<br>";
         p.innerHTML += "X - непроходимые клетки<br>B - начало<br>E - конец<br>";
-        p.innerHTML += "Результатом успешной работы алгоритма будет путь, выделенный жёлтым цветом";
+        p.innerHTML += "Результатом успешной работы алгоритма будет путь, выделенный жёлтым цветом<br>";
+        p.innerHTML += "Красная ячейка - ячейка, которая выбирается на определённой итерации алгоритма<br>";
+        p.innerHTML += "Серая ячейка - ячейка, которая рассматривается на определённой итерации алгоритма<br>";
         div.appendChild(p);
 
         //Нажатия на ячейку
@@ -179,6 +181,7 @@ window.onload = function () {
 
         //Основная часть алгоритма
         b.onclick = async function () {
+            b.disabled = true;
             heuristic = new Array(N);
             let path = new Array(N);
             let visit = new Array(N);
@@ -277,7 +280,7 @@ window.onload = function () {
                     tds[begin].style.backgroundColor = "#FFFF00";
                 }
             }
-
+            b.disabled = false;
         }
         this.remove();
     }

@@ -17,7 +17,7 @@ canvas {
     height: 55px;
     text-align: center;
     display: block;
-    margin-top: 100px;
+    margin-top: 75px;
     color: black;
     font-size: 16pt;
 }
@@ -29,6 +29,14 @@ canvas {
     text-align: center;
     display: block;
     margin-top: 5px;
+    margin-left:auto;
+    margin-right:auto;
     color: black;
     font-size: 24pt;
+}
+footer {
+    background: #c6ffff;
+}
+.main {
+    text-align: center;
 }

@@ -160,6 +160,7 @@ window.onload = function () {
     //Основная часть алгоритма
     let button = document.getElementById('startButton');
     button.onclick = async function () {
+        button.disabled = true;
         if (arrayOfPoints.length < 4) {
             let pop = mix(arrayOfPoints);
             show(pop);
@@ -190,5 +191,6 @@ window.onload = function () {
             select(population, elit);
             console.log("Dist: ", population[0][population[0].length - 1]);
         }
+        button.disabled = false;
     }
 }

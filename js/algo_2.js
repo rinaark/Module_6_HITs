@@ -152,6 +152,7 @@ function Kruscal(arrayOfPoints) {
 }
 
 //функция кластеризации через удаление н рёбер графа
+//(Алгоритм минимального покрывающего дерева)
 function graph(numberOfClusters, arrayOfPoints) {
     let MST = Kruscal(arrayOfPoints);
     let k = MST.length;
