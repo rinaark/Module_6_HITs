@@ -106,7 +106,8 @@ function mutate(population, percent) {
             for (j = 0; j < c1; ++j) newA.push(population[i][j]);
             for (j = c2; j >= c1; --j) newA.push(population[i][j]);
             for (j = c2 + 1; j < population[i].length - 1; ++j) newA.push(population[i][j]);
-            //temp = population[i][c1];
+                    //Первоначальный способ - Мутация через смену мест городов
+            //temp = population[i][c1];                 
             //population[i][c1] = population[i][c2];
             //population[i][c2] = temp;
             newA.push(getScore(newA));
