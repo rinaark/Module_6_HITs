@@ -58,6 +58,6 @@ body{
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
-p{
+p, label{
     color: white;
 }
